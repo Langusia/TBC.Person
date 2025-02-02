@@ -1,3 +1,23 @@
-﻿// See https://aka.ms/new-console-template for more information
+using TBC.Persons.Infrastructure;
 
-Console.WriteLine("Hello, World!");
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+var app = builder.Build();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+}
+
+app.UseHttpsRedirection();
+
+app.MapOpenApi();
+app.MapControllers();
+
+app.Run();
