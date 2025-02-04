@@ -17,6 +17,6 @@ public record RelatedPerson : IEntityBase<long>
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; }
-    public Person Person { get; init; }
-    public Person LinkedPerson { get; init; }
+    public virtual Person Person { get; init; }
+    public virtual Person LinkedPerson { get; init; }
 }

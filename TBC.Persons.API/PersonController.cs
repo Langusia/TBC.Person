@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TBC.Persons.API.Abstractions;
 using TBC.Persons.API.Extensions;
+using TBC.Persons.Application.Persons.Commands.AddRelatedPerson;
 using TBC.Persons.Application.Persons.Commands.Create;
 using TBC.Persons.Application.Persons.Commands.Update;
 using TBC.Persons.Application.Persons.Commands.UploadImage;
@@ -41,6 +42,13 @@ public class PersonController : ApiController
 
     [HttpPatch]
     public async Task<ActionResult<ApiServiceResponse>> Update([FromBody] UpdatePersonCommand request) =>
+        await Result.Create(request)
+            .Bind(command => Sender.Send(request))
+            .Match(() => Ok(new SuccessApiServiceResponse()),
+                fail => HandleFailure(fail));
+
+    [HttpPut("relation")]
+    public async Task<ActionResult<ApiServiceResponse>> PutRelation([FromBody] PutRelatedPersonCommand request) =>
         await Result.Create(request)
             .Bind(command => Sender.Send(request))
             .Match(() => Ok(new SuccessApiServiceResponse()),

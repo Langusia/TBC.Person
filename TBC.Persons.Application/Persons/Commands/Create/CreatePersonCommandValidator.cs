@@ -32,7 +32,7 @@ public class CreatePersonCommandValidator : AbstractValidator<CreatePersonComman
             .Matches("^\\d{11}$").WithMessage(localizer["PersonalNumberFormat"]);
 
         RuleFor(x => x.Gender)
-            .IsInEnum().WithMessage(localizer["GenderRequired"]);
+            .IsInEnum().WithMessage(localizer["OnlyTwo"]);
 
         RuleFor(x => x.CityId)
             .GreaterThan(0).WithMessage(localizer["CityIdRequired"]);

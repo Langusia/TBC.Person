@@ -7,8 +7,8 @@ namespace TBC.Persons.Domain.Entities;
 public class Person : IEntityBase<long>
 {
     public long Id { get; protected set; }
-    public MultiLanguageString FirstName { get; init; }
-    public MultiLanguageString LastName { get; init; }
+    public MultiLanguageString FirstName { get; set; } = new(null, null);
+    public MultiLanguageString LastName { get; set; } = new(null, null);
     public Gender Gender { get; init; }
 
     public string PersonalNumber { get; init; }
@@ -21,7 +21,7 @@ public class Person : IEntityBase<long>
     public virtual long CityId { get; set; }
     public virtual City City { get; set; }
     public virtual List<PhoneNumber> PhoneNumbers { get; set; }
-    public virtual List<RelatedPerson> RelatedPersons { get; init; } = new();
+    public virtual List<RelatedPerson> RelatedPersons { get; set; } = new();
     public DateTime CreatedAt { get; private set; }
     public bool IsActive { get; private set; } = true;
     public bool IsDeleted { get; set; }
