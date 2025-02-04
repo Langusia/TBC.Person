@@ -1,10 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TBC.Persons.Domain.Entities;
 
-namespace TBC.Persons.Infrastructure.Database;
+namespace TBC.Persons.Infrastructure.Database.Contexts;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+public class ApplicationDbContext : DbContext
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+    public ApplicationDbContext()
+    {
+    }
+
     public DbSet<Person?> Persons { get; set; }
     public DbSet<RelatedPerson> RelatedPersons { get; set; }
     public DbSet<PhoneNumber> PhoneNumbers { get; set; }
@@ -18,29 +26,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Person>()
-            .HasMany(rp => rp.RelatedPersons)
-            .WithOne(p => p.Person)
-            .HasForeignKey(rp => rp.PersonId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<RelatedPerson>()
-            .HasOne(rp => rp.Person)
-            .WithMany(p => p.RelatedPersons)
-            .HasForeignKey(rp => rp.PersonId)
-            .OnDelete(DeleteBehavior.Cascade); 
-
-        modelBuilder.Entity<RelatedPerson>()
-            .HasOne(rp => rp.Person)
-            .WithMany()
-            .HasForeignKey(rp => rp.RelatedPersonId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-
-        modelBuilder.Entity<Person>()
-            .HasMany(x => x.PhoneNumbers);
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

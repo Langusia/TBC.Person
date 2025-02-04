@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Localization;
 using TBC.Persons.Domain.Interfaces;
 using TBC.Persons.Infrastructure.Database;
+using TBC.Persons.Infrastructure.Database.Contexts;
 using TBC.Persons.Infrastructure.Localizer;
 
 namespace TBC.Persons.Infrastructure;
@@ -17,16 +18,18 @@ public static class ServiceCollectionExtensions
     {
         //Infrastructure
         services.TryAddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+        services.TryAddScoped<IUnitOfWork, UnitOfWork>();
         services.TryAddScoped<IPersonsRepository, PersonRepository>();
+        services.TryAddScoped<ICityRepository, CityRepository>();
         services.AddDbContext<ApplicationDbContext>(opts =>
             opts.UseSqlServer(configuration.GetConnectionString("ConnectionStrings:DefaultConnection")));
 
         //Localization
+        services.AddLocalization();
         services.AddDbContext<LocalizationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("ConnectionStrings:DefaultConnection")));
 
         services.AddSingleton<IMemoryCache, MemoryCache>();
         services.AddSingleton<IStringLocalizerFactory, DbStringLocalizerFactory>();
-        services.AddLocalization();
     }
 }

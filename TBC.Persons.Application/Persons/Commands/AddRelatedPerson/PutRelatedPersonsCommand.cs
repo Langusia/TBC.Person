@@ -8,14 +8,14 @@ namespace TBC.Persons.Application.Persons.Commands.AddRelatedPerson;
 
 public record PutRelatedPersonsCommand(long Id, List<PutRelatedPerson> RelatedPersons) : IRequest<Result<bool>>;
 
-public class PutRelatedPersonsCommandHandler(IPersonsRepository repository, IMapper mapper)
-    : IRequestHandler<PutRelatedPersonsCommand, Result<bool>>
+public class PutRelatedPersonsCommandHandler(IUnitOfWork uot, IMapper mapper)
+    : IRequestHandler<PutRelatedPersonsCommand, Result>
 {
-    public async Task<Result<bool>> Handle(PutRelatedPersonsCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(PutRelatedPersonsCommand request, CancellationToken cancellationToken)
     {
-        var person = await repository.GetWithRelatedPersons(request.Id);
+        var person = await uot.PersonsRepository.GetPersonFullDataAsync(request.Id, cancellationToken);
         if (person is null)
-            return Result.Failure<bool>(Error.NotFound);
+            return Result.Failure(Error.NotFound);
 
         // Map incoming related persons to entity models
         var incomingRelations = request.RelatedPersons
@@ -51,8 +51,8 @@ public class PutRelatedPersonsCommandHandler(IPersonsRepository repository, IMap
         }
 
         // Persist changes
-        await repository.UpdateAsync(person, cancellationToken: cancellationToken);
-
-        return Result.Success(true);
+        await uot.PersonsRepository.UpdateAsync(person, cancellationToken: cancellationToken);
+        await uot.CompleteWorkAsync(cancellationToken);
+        return Result.Success();
     }
 }

@@ -6,10 +6,10 @@ namespace TBC.Persons.API.Extensions;
 
 public static class ResultExtensions
 {
-    public static async Task<ActionResult> Match(
+    public static async Task<ActionResult<ApiServiceResponse>> Match(
         this Task<Result> resultTask,
-        Func<ActionResult> onSuccess,
-        Func<Result, ActionResult> onFailure
+        Func<ActionResult<ApiServiceResponse>> onSuccess,
+        Func<Result, ActionResult<ApiServiceResponse>> onFailure
     )
     {
         var result = await resultTask;

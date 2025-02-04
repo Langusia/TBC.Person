@@ -16,12 +16,12 @@ public record UpdatePersonCommand(
     DateTime? DateOfBirth,
     int? CityId,
     List<PhoneNumber>? PhoneNumbers
-) : IRequest<Result<bool>>;
+) : IRequest<Result>;
 
 public class UpdatePersonCommandHandler(IRepositoryBase<Person, long> repository, IMapper mapper)
-    : IRequestHandler<UpdatePersonCommand, Result<bool>>
+    : IRequestHandler<UpdatePersonCommand, Result>
 {
-    public async Task<Result<bool>> Handle(UpdatePersonCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdatePersonCommand request, CancellationToken cancellationToken)
     {
         var person = await repository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
         if (person is null)
@@ -30,6 +30,6 @@ public class UpdatePersonCommandHandler(IRepositoryBase<Person, long> repository
         mapper.Map(request, person);
         await repository.UpdateAsync(person, cancellationToken: cancellationToken);
 
-        return Result.Success(true);
+        return Result.Success();
     }
 }

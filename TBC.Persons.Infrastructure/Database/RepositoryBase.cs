@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TBC.Persons.Domain.Entities;
 using TBC.Persons.Domain.Interfaces;
+using TBC.Persons.Infrastructure.Database.Contexts;
 
 namespace TBC.Persons.Infrastructure.Database;
 
@@ -33,20 +34,20 @@ public class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEnti
         return await query.ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<TEntity> GetByIdAsync(
+    public virtual async Task<TEntity?> GetByIdAsync(
         TEntityId id,
         bool asNoTracking = true,
         bool ensureNotNull = true,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<TEntity> query = db.Set<TEntity>();
+        IQueryable<TEntity?> query = db.Set<TEntity>();
 
         if (asNoTracking)
         {
             query = query.AsNoTracking();
         }
 
-        TEntity entity = await query.FirstOrDefaultAsync(entity => entity.Id.Equals(id), cancellationToken);
+        TEntity? entity = await query.FirstOrDefaultAsync(entity => entity.Id.Equals(id), cancellationToken);
 
         return entity;
     }
@@ -71,8 +72,7 @@ public class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEnti
     public virtual async Task<TEntityId> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         await db.Set<TEntity>().AddAsync(entity, cancellationToken);
-        await db.SaveChangesAsync(cancellationToken);
-
+        var s = db.Entry(entity).State;
         return entity.Id;
     }
 
@@ -85,34 +85,28 @@ public class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEnti
         {
             db.Set<TEntity>().Update(entity);
         }
-
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task DeleteAsync(TEntityId id, CancellationToken cancellationToken = default)
     {
         TEntity entity = await db.Set<TEntity>().FindAsync(new object[] { id }, cancellationToken: cancellationToken);
         db.Remove(entity!);
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         db.Remove(entity!);
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteRangeAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
         db.Set<TEntity>().RemoveRange(entities);
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities,
         CancellationToken cancellationToken = default)
     {
         await db.Set<TEntity>().AddRangeAsync(entities, cancellationToken);
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateRangeAsync(IEnumerable<TEntity> entities, bool beginTracking = false,
@@ -122,8 +116,6 @@ public class RepositoryBase<TEntity, TEntityId> : IRepositoryBase<TEntity, TEnti
         {
             db.Set<TEntity>().UpdateRange(entities);
         }
-
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<TEntity>> GetListByIdsAsync(List<TEntityId> ids,

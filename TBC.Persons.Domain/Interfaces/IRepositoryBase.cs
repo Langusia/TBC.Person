@@ -9,7 +9,7 @@ public interface IRepositoryBase<TEntity, TEntityId> where TEntity : class, IEnt
     Task<List<TEntity>> GetAllAsync(bool asNoTracking = true,
         CancellationToken cancellationToken = default);
 
-    Task<TEntity> GetByIdAsync(
+    Task<TEntity?> GetByIdAsync(
         TEntityId id,
         bool asNoTracking = true,
         bool ensureNotNull = true,

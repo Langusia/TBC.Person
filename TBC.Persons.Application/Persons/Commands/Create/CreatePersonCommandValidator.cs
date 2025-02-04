@@ -1,35 +1,46 @@
 ﻿using FluentValidation;
-using TBC.Persons.Application.Persons.Commands.Create;
+using Microsoft.Extensions.Localization;
 using TBC.Persons.Domain.Entities;
 
-namespace TBC.Persons.Application.Persons.Commands;
+namespace TBC.Persons.Application.Persons.Commands.Create;
 
 public class CreatePersonCommandValidator : AbstractValidator<CreatePersonCommand>
 {
-    public CreatePersonCommandValidator()
+    public CreatePersonCommandValidator(IStringLocalizer<CreatePersonCommand> localizer)
     {
         RuleFor(x => x.FirstName)
-            .MaximumLength(50)
-            .MinimumLength(2);
-        RuleFor(x => x.LastName)
-            .MaximumLength(50)
-            .MinimumLength(2);
-        RuleFor(x => x.PersonalNumber)
-            .Matches("^\\d{11}$")
-            .NotNull();
-        RuleFor(x => x.Gender)
-            .NotNull();
-        RuleFor(x => x.CityId)
-            .NotNull();
-        RuleFor(x => x.PicturePath)
-            .NotNull().NotEmpty();
-        RuleFor(x => x.DateOfBirth)
-            .Must(x => x > DateTime.Now.AddYears(-99))
-            .NotNull()
-            .NotEmpty();
+            .NotEmpty().WithMessage(localizer["FirstNameRequired"])
+            .Length(2, 50).WithMessage(localizer["FirstNameLength"])
+            .Matches("^[ა-ჰ]+$").WithMessage(localizer["FirstNameGeorgianOnly"]);
 
-        RuleForEach(x => x.PhoneNumbers)
-            .SetValidator(new PhoneNumberValidator());
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage(localizer["LastNameRequired"])
+            .Length(2, 50).WithMessage(localizer["LastNameLength"])
+            .Matches("^[ა-ჰ]+$").WithMessage(localizer["LastNameGeorgianOnly"]);
+
+        RuleFor(x => x.FirstNameEng)
+            .Matches("^[a-zA-Z]*$").When(x => !string.IsNullOrEmpty(x.FirstNameEng))
+            .WithMessage(localizer["FirstNameEngLatinOnly"]);
+
+        RuleFor(x => x.LastNameEng)
+            .Matches("^[a-zA-Z]*$").When(x => !string.IsNullOrEmpty(x.LastNameEng))
+            .WithMessage(localizer["LastNameEngLatinOnly"]);
+
+
+        RuleFor(x => x.PersonalNumber)
+            .NotEmpty().WithMessage(localizer["PersonalNumberRequired"])
+            .Matches("^\\d{11}$").WithMessage(localizer["PersonalNumberFormat"]);
+
+        RuleFor(x => x.Gender)
+            .IsInEnum().WithMessage(localizer["GenderRequired"]);
+
+        RuleFor(x => x.CityId)
+            .GreaterThan(0).WithMessage(localizer["CityIdRequired"]);
+
+        RuleFor(x => x.DateOfBirth)
+            .NotEmpty().WithMessage(localizer["DateOfBirthRequired"])
+            .LessThan(DateTime.Now).WithMessage(localizer["DateOfBirthFuture"])
+            .GreaterThan(DateTime.Now.AddYears(-99)).WithMessage(localizer["DateOfBirthOld"]);
     }
 }
 

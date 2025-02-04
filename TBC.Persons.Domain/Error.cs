@@ -2,7 +2,7 @@
 
 namespace TBC.Persons.Domain;
 
-public class Error : IEquatable<Error>
+public class Error
 {
     public static readonly Error None = new(string.Empty, string.Empty, ErrorTypeEnum.None);
 
@@ -12,9 +12,17 @@ public class Error : IEquatable<Error>
         ErrorTypeEnum.BadRequest
     );
 
+
     public static readonly Error NullValue = new(
         "Error.NullValue",
         "The specified result value is null.",
+        ErrorTypeEnum.BadRequest
+    );
+
+    public static Error AlreadyExists(string message) => new
+    (
+        "Error.AlreadyExists",
+        message,
         ErrorTypeEnum.BadRequest
     );
 

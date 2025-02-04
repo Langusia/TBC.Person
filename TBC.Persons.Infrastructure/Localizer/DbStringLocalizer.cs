@@ -27,9 +27,21 @@ public class DbStringLocalizer : IStringLocalizer
             }
 
             var value = _context.LocalizedStrings
-                .FirstOrDefault(x => x.ResourceKey == name && x.Culture == culture)?.ResourceValue ?? name;
+                .FirstOrDefault(x => x.ResourceKey == name && x.Culture == culture)?.ResourceValue;
 
-            _cache.Set(cacheKey, value, TimeSpan.FromMinutes(30)); // Cached for 30 minutes
+            if (value is null)
+            {
+                value = $"{culture}_{name}";
+                _context.LocalizedStrings.Add(new TBC.Persons.Domain.Entities.LocalizedString()
+                {
+                    Culture = culture,
+                    ResourceKey = name,
+                    ResourceValue = value
+                });
+                _context.SaveChanges();
+            }
+
+            _cache.Set(cacheKey, value, TimeSpan.FromMinutes(30));
 
             return new LocalizedString(name, value);
         }

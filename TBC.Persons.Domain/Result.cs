@@ -48,6 +48,7 @@ public class Result
         new(default, false, errors);
 
     public static Result<TValue> Create<TValue>(TValue? value) => Success(value);
+    public static Result Create() => Success();
 
     public static Result<T> Ensure<T>(T value, Func<T, bool> predicate, Error error)
     {

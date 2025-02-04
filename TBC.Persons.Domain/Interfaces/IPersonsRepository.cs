@@ -1,6 +1,13 @@
-﻿namespace TBC.Persons.Domain.Interfaces;
+﻿using TBC.Persons.Domain.Entities;
+
+namespace TBC.Persons.Domain.Interfaces;
 
 public interface IPersonsRepository : IRepositoryBase<Person, long>
 {
-    Task<Person?> GetWithRelatedPersons(long id);
+    Task<Person?> GetPersonFullDataAsync(long id, CancellationToken cancellationToken);
+    Task<Person?> GetByPersonalNumberAsync(string personalNumber, CancellationToken cancellationToken);
+
+    Task<PaginatedList<Person>?> GetPersonsAsync(string? firstName, string? lastName, string? personalNumber,
+        int pageNumber,
+        int pageSize, CancellationToken cancellationToken);
 }
