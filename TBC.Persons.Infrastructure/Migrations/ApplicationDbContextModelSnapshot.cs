@@ -129,6 +129,9 @@ namespace TBC.Persons.Infrastructure.Migrations
 
                     b.HasIndex("PersonId");
 
+                    b.HasIndex("Type", "Number")
+                        .IsUnique();
+
                     b.ToTable("PhoneNumbers");
                 });
 

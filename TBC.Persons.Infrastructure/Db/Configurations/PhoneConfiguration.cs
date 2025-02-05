@@ -10,5 +10,6 @@ public class PhoneConfiguration : IEntityTypeConfiguration<PhoneNumber>
     {
         builder.Property(x => x.IsActive).HasDefaultValue(true);
         builder.Property(m => m.CreatedAt).HasDefaultValueSql("getdate()");
+        builder.HasIndex(x => new { x.Type, x.Number }).IsUnique();
     }
 }
