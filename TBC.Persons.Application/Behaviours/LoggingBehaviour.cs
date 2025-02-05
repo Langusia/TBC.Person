@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using System.Diagnostics.CodeAnalysis;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using TBC.Persons.Domain;
 
 namespace TBC.Persons.Application.Behaviours;
 
+[ExcludeFromCodeCoverage]
 public class LoggingBehaviour<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System.Globalization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
-using System.Globalization;
-using TBC.Persons.Infrastructure.Localizer;
+
+namespace TBC.Persons.Infrastructure.Localizer;
 
 public class DbStringLocalizer : IStringLocalizer
 {

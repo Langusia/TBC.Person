@@ -2,7 +2,7 @@
 using TBC.Persons.Domain.Entities;
 using TBC.Persons.Domain.Enums;
 using TBC.Persons.Domain.Values;
-using TBC.Persons.Infrastructure.Database.Contexts;
+using TBC.Persons.Infrastructure.Db.Contexts;
 
 namespace TBC.Persons.Infrastructure.Seeder;
 
@@ -15,11 +15,29 @@ public class PersonDbDataSeeder
 
         await context.SaveChangesAsync();
     }
+
+    public static async Task Seed(ReportingDbContext context)
+    {
+        await PersonsSeeder.Seed(context);
+        await CitiesSeeder.Seed(context);
+
+        await context.SaveChangesAsync();
+    }
 }
 
 public class CitiesSeeder
 {
     public static async Task Seed(ApplicationDbContext context)
+    {
+        if (!await context.Set<City>().AnyAsync())
+        {
+            var cities = GetCities();
+
+            await context.Set<City>().AddRangeAsync(cities);
+        }
+    }
+
+    public static async Task Seed(ReportingDbContext context)
     {
         if (!await context.Set<City>().AnyAsync())
         {
@@ -43,6 +61,16 @@ public class CitiesSeeder
 public class PersonsSeeder
 {
     public static async Task Seed(ApplicationDbContext context)
+    {
+        if (!await context.Set<Person>().AnyAsync())
+        {
+            var persons = GetPersons();
+
+            await context.Set<Person>().AddRangeAsync(persons);
+        }
+    }
+
+    public static async Task Seed(ReportingDbContext context)
     {
         if (!await context.Set<Person>().AnyAsync())
         {

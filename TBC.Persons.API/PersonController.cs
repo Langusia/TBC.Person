@@ -2,15 +2,18 @@
 using Microsoft.AspNetCore.Mvc;
 using TBC.Persons.API.Abstractions;
 using TBC.Persons.API.Extensions;
-using TBC.Persons.Application.Persons.Commands.AddRelatedPerson;
-using TBC.Persons.Application.Persons.Commands.Create;
-using TBC.Persons.Application.Persons.Commands.Update;
-using TBC.Persons.Application.Persons.Commands.UploadImage;
-using TBC.Persons.Application.Persons.Query.GetPersonListQuery;
-using TBC.Persons.Application.Persons.Query.GetPersonQuery;
+using TBC.Persons.Application.Features.Commands.Persons.Create;
+using TBC.Persons.Application.Features.Commands.Persons.PutRelatedPerson;
+using TBC.Persons.Application.Features.Commands.Persons.Update;
+using TBC.Persons.Application.Features.Commands.Persons.UploadImage;
+using TBC.Persons.Application.Features.Queries.Persons.GetPersonListQuery;
+using TBC.Persons.Application.Features.Queries.Persons.GetPersonQuery;
+using TBC.Persons.Application.Features.Queries.Persons.GetRelationshipReport;
 using TBC.Persons.Domain;
 using TBC.Persons.Domain.Entities;
 using TBC.Persons.Domain.Messages;
+using TBC.Persons.Domain.Queries;
+using TBC.Persons.Domain.Values;
 
 namespace TBC.Persons.API;
 
@@ -63,6 +66,16 @@ public class PersonController : ApiController
             .Match(
                 success => Ok(new SuccessApiServiceResponse<PaginatedList<Person>>(success)),
                 HandleFailure<PaginatedList<Person>>
+            );
+
+    [HttpGet("report")]
+    public async Task<ActionResult<ApiServiceResponse<List<RelationReportItem>>>> GetReport(
+        CancellationToken cancellationToken) =>
+        await Result.Create(new GetRelationshipReportQuery())
+            .Bind(query => Sender.Send(query, cancellationToken))
+            .Match(
+                success => Ok(new SuccessApiServiceResponse<List<RelationReportItem>>(success)),
+                HandleFailure<List<RelationReportItem>>
             );
 
     [HttpGet("{id}")]

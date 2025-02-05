@@ -1,10 +1,12 @@
-﻿using FluentValidation;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentValidation;
 using MediatR;
 using TBC.Persons.Domain;
 using TBC.Persons.Domain.Enums;
 
 namespace TBC.Persons.Application.Behaviours;
 
+[ExcludeFromCodeCoverage]
 public class RequestValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

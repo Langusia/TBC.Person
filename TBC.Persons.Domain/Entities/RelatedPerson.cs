@@ -3,7 +3,7 @@ using TBC.Persons.Domain.Enums;
 
 namespace TBC.Persons.Domain.Entities;
 
-public record RelatedPerson : IEntityBase<long>
+public class RelatedPerson : BaseEntity<long>
 {
     public long Id { get; protected set; }
 
@@ -14,9 +14,7 @@ public record RelatedPerson : IEntityBase<long>
 
     public long PersonId { get; init; }
     public long RelatedPersonId { get; init; }
-    public DateTime CreatedAt { get; set; }
-    public bool IsActive { get; set; } = true;
-    public bool IsDeleted { get; set; }
+
     public virtual Person Person { get; init; }
     public virtual Person LinkedPerson { get; init; }
 }

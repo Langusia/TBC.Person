@@ -3,8 +3,7 @@ using Serilog;
 using TBC.Persons.API.Middlewares;
 using TBC.Persons.Application;
 using TBC.Persons.Infrastructure;
-using TBC.Persons.Infrastructure.Database.Contexts;
-using TBC.Persons.Infrastructure.Localizer;
+using TBC.Persons.Infrastructure.Db.Contexts;
 using TBC.Persons.Infrastructure.Seeder;
 
 //////////host-builder//////////////////
@@ -29,11 +28,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 ///////app////////////
 var app = builder.Build();
 /////////seeder////////////////
-await using (var ctx = app.Services.GetService<ApplicationDbContext>())
-{
-    ctx.Database.MigrateAsync().Wait();
-    await PersonDbDataSeeder.Seed(ctx);
-}
+//await using (var ctx = app.Services.GetService<ApplicationDbContext>())
+//{
+//    ctx.Database.MigrateAsync().Wait();
+//    await PersonDbDataSeeder.Seed(ctx);
+//}
 
 //await using (var ctx = app.Services.GetService<LocalizationDbContext>())
 //{

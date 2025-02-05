@@ -1,4 +1,4 @@
-﻿namespace TBC.Persons.Domain;
+﻿namespace TBC.Persons.Domain.Values;
 
 public class PaginatedList<T>
 {
