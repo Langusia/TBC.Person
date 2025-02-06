@@ -5,15 +5,18 @@ namespace TBC.Persons.Infrastructure.Localizer;
 
 public class DbStringLocalizerFactory : IStringLocalizerFactory
 {
-    private readonly LocalizationDbContext _context;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IMemoryCache _cache;
 
-    public DbStringLocalizerFactory(LocalizationDbContext context, IMemoryCache cache)
+    public DbStringLocalizerFactory(IServiceProvider serviceProvider, IMemoryCache cache)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cache = cache;
     }
 
-    public IStringLocalizer Create(Type resourceSource) => new DbStringLocalizer(_context, _cache);
-    public IStringLocalizer Create(string baseName, string location) => new DbStringLocalizer(_context, _cache);
+    public IStringLocalizer Create(Type resourceSource) =>
+        new DbStringLocalizer(_serviceProvider, _cache);
+
+    public IStringLocalizer Create(string baseName, string location) =>
+        new DbStringLocalizer(_serviceProvider, _cache);
 }

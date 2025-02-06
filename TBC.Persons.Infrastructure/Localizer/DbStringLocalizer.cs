@@ -1,17 +1,18 @@
 ﻿using System.Globalization;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
 namespace TBC.Persons.Infrastructure.Localizer;
 
 public class DbStringLocalizer : IStringLocalizer
 {
-    private readonly LocalizationDbContext _context;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IMemoryCache _cache;
 
-    public DbStringLocalizer(LocalizationDbContext context, IMemoryCache cache)
+    public DbStringLocalizer(IServiceProvider serviceProvider, IMemoryCache cache)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cache = cache;
     }
 
@@ -19,6 +20,9 @@ public class DbStringLocalizer : IStringLocalizer
     {
         get
         {
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
+
             var culture = CultureInfo.CurrentUICulture.Name;
             var cacheKey = $"{culture}_{name}";
 
@@ -27,19 +31,19 @@ public class DbStringLocalizer : IStringLocalizer
                 return new LocalizedString(name, cachedValue);
             }
 
-            var value = _context.LocalizedStrings
+            var value = context.LocalizedStrings
                 .FirstOrDefault(x => x.ResourceKey == name && x.Culture == culture)?.ResourceValue;
 
             if (value is null)
             {
                 value = $"{culture}_{name}";
-                _context.LocalizedStrings.Add(new TBC.Persons.Domain.Entities.LocalizedString()
+                context.LocalizedStrings.Add(new TBC.Persons.Domain.Entities.LocalizedString()
                 {
                     Culture = culture,
                     ResourceKey = name,
                     ResourceValue = value
                 });
-                _context.SaveChanges();
+                context.SaveChanges();
             }
 
             _cache.Set(cacheKey, value, TimeSpan.FromMinutes(30));
@@ -64,7 +68,10 @@ public class DbStringLocalizer : IStringLocalizer
 
         if (!_cache.TryGetValue(cacheKey, out List<LocalizedString> cachedStrings))
         {
-            cachedStrings = _context.LocalizedStrings
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
+
+            cachedStrings = context.LocalizedStrings
                 .Where(x => x.Culture == culture)
                 .Select(x => new LocalizedString(x.ResourceKey, x.ResourceValue))
                 .ToList();
