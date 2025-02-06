@@ -29,15 +29,17 @@ builder.Services.AddInfrastructure(builder.Configuration);
 ///////app////////////
 var app = builder.Build();
 /////////seeder////////////////
-await using (var ctx = app.Services.GetService<ApplicationDbContext>())
+using (var scope = app.Services.CreateScope())
 {
+    var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     ctx.Database.MigrateAsync().Wait();
     await PersonDbDataSeeder.Seed(ctx);
 }
 
-await using (var localCtx = app.Services.GetService<LocalizationDbContext>())
+using (var scope = app.Services.CreateScope())
 {
-    localCtx.Database.MigrateAsync().Wait();
+    var localCtx = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
+    localCtx.Database.Migrate();
 }
 
 //////////pipeline/////////////
