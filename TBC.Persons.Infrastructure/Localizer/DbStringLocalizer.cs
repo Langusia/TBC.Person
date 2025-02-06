@@ -23,7 +23,7 @@ public class DbStringLocalizer : IStringLocalizer
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
 
-            var culture = CultureInfo.CurrentUICulture.Name;
+            var culture = Thread.CurrentThread.CurrentCulture.Name;
             var cacheKey = $"{culture}_{name}";
 
             if (_cache.TryGetValue(cacheKey, out string cachedValue))
